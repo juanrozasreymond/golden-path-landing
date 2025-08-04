@@ -1,0 +1,128 @@
+<script type="text/javascript">
+        var gk_isXlsx = false;
+        var gk_xlsxFileLookup = {};
+        var gk_fileData = {};
+        function filledCell(cell) {
+          return cell !== '' && cell != null;
+        }
+        function loadFileData(filename) {
+        if (gk_isXlsx && gk_xlsxFileLookup[filename]) {
+            try {
+                var workbook = XLSX.read(gk_fileData[filename], { type: 'base64' });
+                var firstSheetName = workbook.SheetNames[0];
+                var worksheet = workbook.Sheets[firstSheetName];
+
+                // Convert sheet to JSON to filter blank rows
+                var jsonData = XLSX.utils.sheet_to_json(worksheet, { header: 1, blankrows: false, defval: '' });
+                // Filter out blank rows (rows where all cells are empty, null, or undefined)
+                var filteredData = jsonData.filter(row => row.some(filledCell));
+
+                // Heuristic to find the header row by ignoring rows with fewer filled cells than the next row
+                var headerRowIndex = filteredData.findIndex((row, index) =>
+                  row.filter(filledCell).length >= filteredData[index + 1]?.filter(filledCell).length
+                );
+                // Fallback
+                if (headerRowIndex === -1 || headerRowIndex > 25) {
+                  headerRowIndex = 0;
+                }
+
+                // Convert filtered JSON back to CSV
+                var csv = XLSX.utils.aoa_to_sheet(filteredData.slice(headerRowIndex)); // Create a new sheet from filtered array of arrays
+                csv = XLSX.utils.sheet_to_csv(csv, { header: 1 });
+                return csv;
+            } catch (e) {
+                console.error(e);
+                return "";
+            }
+        }
+        return gk_fileData[filename] || "";
+        }
+        </script><!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Golden Path Protocol</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.production.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/7.22.10/babel.min.js"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body>
+    <div id="root"></div>
+    <script type="text/babel">
+        function App() {
+            return (
+                <div className="min-h-screen bg-gray-100 flex flex-col items-center py-8 px-4">
+                    <header className="text-center mb-8">
+                        <h1 className="text-4xl font-bold text-blue-800">Golden Path Protocol</h1>
+                        <p className="text-lg text-gray-600 mt-2">Let's migrate together into financial freedom</p>
+                    </header>
+                    <main className="max-w-4xl w-full bg-white shadow-lg rounded-lg p-6">
+                        <section className="mb-8">
+                            <h2 className="text-2xl font-semibold text-blue-700 mb-4">About the Project</h2>
+                            <p className="text-gray-700">
+                                The Golden Path Protocol is an attempt to create an alternative financial system running on every person's smartphone. It has no ownership, tiny microfees, and is fully autonomous in Layer 1 (currency and minting). Layer 2 DeFi is to be developed by a concession system to create services such as exchange, savings, and loans, ruled by a DAO and AI Co-Pilot for transparent governance.
+                            </p>
+                            <p className="text-gray-700 mt-2">
+                                I am looking for a CTO and CFO to gestate the first stage of the project.
+                            </p>
+                            <div className="mt-4 flex flex-wrap gap-4">
+                                <a
+                                    href="https://drive.google.com/uc?export=download&id=FILE_ID_FULL_PROPOSAL"
+                                    download
+                                    className="inline-block px-6 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
+                                >
+                                    Download Whitepaper
+                                </a>
+                                <a
+                                    href="https://drive.google.com/uc?export=download&id=FILE_ID_INTRO"
+                                    download
+                                    className="inline-block px-6 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
+                                >
+                                    Download Intro
+                                </a>
+                                <a
+                                    href="https://drive.google.com/uc?export=download&id=FILE_ID_ARCHITECTURE"
+                                    download
+                                    className="inline-block px-6 py-2 bg-blue-400 text-white rounded hover:bg-blue-500"
+                                >
+                                    Download Architecture
+                                </a>
+                            </div>
+                        </section>
+                        <section className="mb-8">
+                            <h2 className="text-2xl font-semibold text-blue-700 mb-4">System Overview</h2>
+                            <img
+                                src="https://drive.google.com/uc?export=download&id=FILE_ID_PNG"
+                                alt="Golden Path System Overview"
+                                className="w-full max-w-lg mx-auto"
+                            />
+                        </section>
+                        <section>
+                            <h2 className="text-2xl font-semibold text-blue-700 mb-4">Get Involved</h2>
+                            <p className="text-gray-700">
+                                Interested in contributing? Contact Juan Rozas Reymond via email to discuss collaboration.
+                            </p>
+                            <div className="mt-4">
+                                <a
+                                    href="mailto:your.email@example.com"
+                                    className="inline-block px-6 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
+                                >
+                                    Email Juan
+                                </a>
+                            </div>
+                        </section>
+                    </main>
+                    <footer className="mt-8 text-gray-600 text-center">
+                        <p>&copy; 2025 Golden Path Protocol. Open-source under MIT license.</p>
+                    </footer>
+                </div>
+            );
+        }
+
+        const root = ReactDOM.createRoot(document.getElementById('root'));
+        root.render(<App />);
+    </script>
+</body>
+</html>
